@@ -1,38 +1,9 @@
 {
+  "type": "FeatureCollection",
   "features": [
     {
       "geometry": {
-        "coordinates": [
-          [
-            [
-              -1.0107421875,
-              50.127621728300475
-            ],
-            [
-              1.373291015625,
-              50.127621728300475
-            ],
-            [
-              1.373291015625,
-              50.63901028125873
-            ],
-            [
-              -1.0107421875,
-              50.63901028125873
-            ],
-            [
-              -1.0107421875,
-              50.127621728300475
-            ]
-          ]
-        ],
-        "type": "Polygon"
-      },
-      "properties": {},
-      "type": "Feature"
-    },
-    {
-      "geometry": {
+        "type": "Polygon",
         "coordinates": [
           [
             [
@@ -72,14 +43,14 @@
               50.46274956681952
             ]
           ]
-        ],
-        "type": "Polygon"
+        ]
       },
       "properties": {},
       "type": "Feature"
     },
     {
       "geometry": {
+        "type": "Polygon",
         "coordinates": [
           [
             [
@@ -119,14 +90,14 @@
               50.38575657202081
             ]
           ]
-        ],
-        "type": "Polygon"
+        ]
       },
       "properties": {},
       "type": "Feature"
     },
     {
       "geometry": {
+        "type": "Polygon",
         "coordinates": [
           [
             [
@@ -162,14 +133,14 @@
               50.48023052012273
             ]
           ]
-        ],
-        "type": "Polygon"
+        ]
       },
       "properties": {},
       "type": "Feature"
     },
     {
       "geometry": {
+        "type": "Polygon",
         "coordinates": [
           [
             [
@@ -209,14 +180,14 @@
               50.533507513540435
             ]
           ]
-        ],
-        "type": "Polygon"
+        ]
       },
       "properties": {},
       "type": "Feature"
     },
     {
       "geometry": {
+        "type": "Polygon",
         "coordinates": [
           [
             [
@@ -316,12 +287,10 @@
               50.30863837348728
             ]
           ]
-        ],
-        "type": "Polygon"
+        ]
       },
       "properties": {},
       "type": "Feature"
     }
-  ],
-  "type": "FeatureCollection"
+  ]
 }
