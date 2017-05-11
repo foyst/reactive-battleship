@@ -15,7 +15,7 @@ object Main extends App {
   implicit val mat = ActorMaterializer()
   implicit val conf = system.settings.config
 
-  val kafkaBootstrapServer = "192.168.99.102:9092,192.168.99.102:9093,192.168.99.102:9094"
+  val kafkaBootstrapServer = "192.168.99.100:9092"
   val inKafkaTopic = "processed_position_updates"
   val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
     .withBootstrapServers(kafkaBootstrapServer)

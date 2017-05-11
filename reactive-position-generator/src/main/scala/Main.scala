@@ -31,7 +31,7 @@ object Main extends App {
   val longitudeRange = CoordinateRange(coordinates.minBy(_.longitude).longitude, coordinates.maxBy(_.longitude).longitude)
 
   val generatedPositionsCounter = Kamon.metrics.counter("generated-coordinates")
-  val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer).withBootstrapServers("192.168.99.102:9092,192.168.99.102:9093,192.168.99.102:9094")
+  val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer).withBootstrapServers("192.168.99.100:9092")
   val kafkaTopic = "position_updates"
 
   val throttledCoordinateSource = Source.fromGraph(GraphDSL.create() { implicit b =>
@@ -39,7 +39,7 @@ object Main extends App {
 
     val zipper = b.add(ZipWith[Tick, Coordinates, Coordinates]((tick, coordinates) => coordinates))
 
-    Source.tick(initialDelay = 0.second, interval = 5.milliseconds, Tick()) ~> zipper.in0
+    Source.tick(initialDelay = 0.second, interval = 10.milliseconds, Tick()) ~> zipper.in0
     Source.fromGraph(CoordinateGeneratingSource(latitudeRange, longitudeRange)) ~> zipper.in1
     SourceShape(zipper.out)
   })

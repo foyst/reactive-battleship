@@ -28,11 +28,12 @@ object Main extends App {
 
   val concurrentGeofenceDetector = new ConcurrentGeofenceDetector(battleships)
 
-  val kafkaBootstrapServer = "192.168.99.102:9092,192.168.99.102:9093,192.168.99.102:9094"
+  val kafkaBootstrapServer = "192.168.99.100:9092"
   val inKafkaTopic = "position_updates"
   val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
     .withBootstrapServers(kafkaBootstrapServer)
-    .withGroupId("streaming-geofence-detector")
+    .withGroupId("reactive-geofence-detector")
+    .withClientId(s"client-${scala.util.Random.nextInt(100)}")
     .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
   val generatedPositionsCounter = Kamon.metrics.counter("detected-coordinates")
@@ -44,7 +45,7 @@ object Main extends App {
   val slowProcessingSimulator = Flow.fromGraph(GraphDSL.create() { implicit b =>
     import GraphDSL.Implicits._
     val geofenceDetector = b.add(Flow[Coordinates].map { concurrentGeofenceDetector.process(_)})
-    val tick = b.add(Source.tick(0 seconds, 10 millis, Tick()))
+    val tick = b.add(Source.tick(0 seconds, 20 millis, Tick()))
     val zip = b.add(Zip[Tuple2[Coordinates, Boolean], Tick]())
     val stripTick = b.add(Flow[Tuple2[Tuple2[Coordinates, Boolean], Tick]].map(_._1))
 
@@ -60,7 +61,7 @@ object Main extends App {
     .map { consumerRecord => consumerRecord.committableOffset.commitScaladsl(); consumerRecord }
     .map { consumerRecord => generatedPositionsCounter.increment(); consumerRecord }
     .map(consumerRecord => JsonParser(consumerRecord.record.value()).convertTo[Coordinates])
-    .buffer(4000, OverflowStrategy.backpressure)
+    .buffer(2000, OverflowStrategy.backpressure)
     .via(slowProcessingSimulator)
     .map(results => JsObject(results._1.toJson.asJsObject.fields + ("hit" -> JsBoolean(results._2))))
     .map(resultsJson => new ProducerRecord[String, String](outKafkaTopic, resultsJson.compactPrint))
