@@ -1,11 +1,4 @@
-//var map = L.map('map').setView([51.505, -0.09], 13);
-var map = L.map('map', {center: [51.505, -0.09], zoom: 13})
-
-//creates a marker with a custom icon
-function pointToLayer (feature, latlng) {
-    return L.marker(latlng, {icon: busIcon});
-}
-
+var map = L.map('map', {center: [50.406, 0.255], zoom: 9})
 
 //add a background tile layer
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibmVpbGR1bmxvcCIsImEiOiJjaXhycGc1bDQwMDQ3MnhxaXFibDl4cXRsIn0.crgrBXCV-JDmTRk0j7Lg8w', {
@@ -15,9 +8,15 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
     accessToken: 'pk.eyJ1IjoibmVpbGR1bmxvcCIsImEiOiJjaXhycGc1bDQwMDQ3MnhxaXFibDl4cXRsIn0.crgrBXCV-JDmTRk0j7Lg8w'
 }).addTo(map);
 
-//define a custom icon for our bus markers
-var busIcon = L.icon({
-    iconUrl: '/ShuttleIcon_Blue.gif',
+var missIcon = L.icon({
+    iconUrl: '/splash.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -28]
+});
+
+var hitIcon = L.icon({
+    iconUrl: '/explosion_once.gif',
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -28]
@@ -29,13 +28,20 @@ var ws;
     "use strict";
     if (window.WebSocket) {
         console.log("WebSocket object is supported in your browser");
-        ws = new WebSocket("ws://192.168.99.102:8082");
+        ws = new WebSocket("ws://192.168.99.100:8082");
+
+        ws.onopen = function() {
+            ws.send('fire the cannon!');
+        };
+
         ws.onmessage = function(e) {
             console.log("echo from server : " + e.data);
             var positionJson = JSON.parse(e.data);
-            L.marker([positionJson.latitude, positionJson.longitude], {icon: busIcon}).addTo(map);
+            L.marker([positionJson.latitude, positionJson.longitude], {icon: positionJson.hit ? hitIcon : missIcon}).addTo(map);
             console.log("updated");
-            sleep(2000);
+            setTimeout(function(){ 
+                ws.send('fire the cannon!');;
+            }, 2000);
         };
 
         ws.onclose = function() {
