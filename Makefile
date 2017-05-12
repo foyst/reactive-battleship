@@ -1,4 +1,5 @@
-# SHELL := /bin/bash
+docker-machine-create:
+	docker-machine create --virtualbox-cpu-count 4 --virtualbox-memory 5120 --virtualbox-disk-size 40960 reactive-battleship
 
 build:
 	cd reactive-position-generator; sbt clean compile assembly docker:publishLocal
@@ -8,8 +9,10 @@ build:
 start:
 	docker-compose up -d zookeeper grafana; sleep 5;
 	docker-compose up -d kafka1; sleep 10;
-	docker-compose up -d geofence-detector
-	# docker-compose up -d
+	docker-compose up -d geofence-detector websocket-client battleship-ui
+
+fire:
+	docker-compose up -d position-generator
 
 stop:
 	docker-compose kill && docker-compose rm -f
