@@ -13,12 +13,12 @@ object Main extends App {
 
   implicit val system = ActorSystem.create("battleship-client")
   implicit val mat = ActorMaterializer()
-  implicit val conf = system.settings.config
 
-  val kafkaBootstrapServer = "192.168.99.100:9092"
+  val conf = system.settings.config  
+  val kafkaBootstrapServers = conf.getString("kafka.bootstrap-servers")
   val inKafkaTopic = "processed_position_updates"
   val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
-    .withBootstrapServers(kafkaBootstrapServer)
+    .withBootstrapServers(kafkaBootstrapServers)
     .withGroupId("streaming-geofence-detector")
     .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
 

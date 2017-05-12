@@ -1,16 +1,15 @@
+import GeoJsonProtocol._
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.{Consumer, Producer}
 import akka.kafka.{ConsumerSettings, ProducerSettings, Subscriptions}
-import akka.stream.{ActorMaterializer, FlowShape, OverflowStrategy}
 import akka.stream.scaladsl.{Flow, GraphDSL, Source, Zip}
+import akka.stream.{ActorMaterializer, FlowShape, OverflowStrategy}
+import kamon.Kamon
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 import spray.json._
-import GeoJsonProtocol._
-import kamon.Kamon
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 case class Tick()
@@ -22,16 +21,18 @@ object Main extends App {
   import system.dispatcher
 
   implicit val system = ActorSystem.create("ReactiveGeofenceDetector")
+
   implicit val materializer = ActorMaterializer()
 
   val battleships: String = io.Source.fromInputStream(getClass.getResourceAsStream("battleships.json")).mkString
 
   val concurrentGeofenceDetector = new ConcurrentGeofenceDetector(battleships)
 
-  val kafkaBootstrapServer = "192.168.99.100:9092"
+  val conf = system.settings.config
+  val kafkaBootstrapServers = conf.getString("kafka.bootstrap-servers")
   val inKafkaTopic = "position_updates"
   val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
-    .withBootstrapServers(kafkaBootstrapServer)
+    .withBootstrapServers(kafkaBootstrapServers)
     .withGroupId("reactive-geofence-detector")
     .withClientId(s"client-${scala.util.Random.nextInt(100)}")
     .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
@@ -40,7 +41,7 @@ object Main extends App {
 
   val outKafkaTopic = "processed_position_updates"
   val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
-    .withBootstrapServers(kafkaBootstrapServer)
+    .withBootstrapServers(kafkaBootstrapServers)
 
   val slowProcessingSimulator = Flow.fromGraph(GraphDSL.create() { implicit b =>
     import GraphDSL.Implicits._
