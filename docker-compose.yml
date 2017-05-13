@@ -53,6 +53,12 @@ services:
       environment:
       - JAVA_OPTS=-Dkafka.bootstrap-servers=${HOSTIP}:9092 -Dkamon.statsd.hostname=${HOSTIP}
 
+    kafka-consumer-lag-monitor:
+      image: kafka-consumer-lag-monitor:1.0
+      depends_on: [kafka1]
+      environment:
+        - JAVA_OPTS=-Dkafka.bootstrap-servers=${HOSTIP}:9092 -Dkamon.statsd.hostname=${HOSTIP}
+
     battleship-ui:
       image: nginx
       depends_on: [websocket-client]
@@ -61,7 +67,3 @@ services:
       volumes:
         - /Users/IW-benfoster/Projects/demos/reactive-battleship/conf/nginx/nginx.conf:/etc/nginx/nginx.conf
         - /Users/IW-benfoster/Projects/demos/reactive-battleship/battleship-ui/:/usr/share/nginx/html:ro
-
-    kafka-consumer-lag-monitor:
-      image: kafka-consumer-lag-monitor:1.0
-      depends_on: [kafka1]

@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
 
 assemblyMergeStrategy in assembly := {
   case x if x.endsWith("aop.xml") => MergeStrategy.first
+  case x if x.contains("org/slf4j/impl") => MergeStrategy.first
   case x =>
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(x)
