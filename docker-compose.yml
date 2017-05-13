@@ -61,3 +61,7 @@ services:
       volumes:
         - /Users/IW-benfoster/Projects/demos/reactive-battleship/conf/nginx/nginx.conf:/etc/nginx/nginx.conf
         - /Users/IW-benfoster/Projects/demos/reactive-battleship/battleship-ui/:/usr/share/nginx/html:ro
+
+    kafka-consumer-lag-monitor:
+      image: kafka-consumer-lag-monitor:1.0
+      depends_on: [kafka1]
